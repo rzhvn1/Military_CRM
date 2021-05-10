@@ -22,7 +22,7 @@ class Car(models.Model):
         ('State', 'State'),
         ('Private', 'Private'),
     )
-    dossier = models.ForeignKey(Dossier, on_delete=models.CASCADE)
+    dossier = models.ForeignKey(Dossier, on_delete=models.CASCADE, related_name='cars')
     mark = models.CharField(max_length=100)
     car_model = models.CharField(max_length=100)
     year = models.DateField(auto_now_add=True)
@@ -32,3 +32,21 @@ class Car(models.Model):
 
     def __str__(self):
         return self.mark
+
+class Education(models.Model):
+    dossier = models.ForeignKey(Dossier, on_delete=models.CASCADE, related_name='educations')
+    start_date = models.DateField()
+    end_date = models.DateField()
+    school_name = models.CharField(max_length=50)
+    major = models.CharField(max_length=50)
+
+
+class Warcraft(models.Model):
+    dossier = models.ForeignKey(Dossier, on_delete=models.CASCADE, related_name='warcrafts')
+    start_date = models.DateField()
+    end_date = models.DateField()
+    military_area = models.CharField(max_length=100)
+    major = models.CharField(max_length=100)
+    start_pose = models.CharField(max_length=100)
+    end_pose = models.CharField(max_length=100)
+
