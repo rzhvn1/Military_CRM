@@ -1,6 +1,8 @@
 import datetime
 
+from django.contrib.auth.models import Group
 from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 
 from .models import *
 from rest_framework import serializers
@@ -22,3 +24,15 @@ class DocumentSerializer(serializers.ModelSerializer):
             obj.status = check_date
             obj.save()
         return check_date
+
+    def create(self, validated_data):
+        user = validated_data.pop('user')
+        group = user.groups.all()[0].name
+        doc_root = validated_data['document_root']
+        if group == 'general' and doc_root in ['public', 'private', 'secret']:
+            document = Document.objects.create(**validated_data)
+        elif group == 'president':
+            document = Document.objects.create(**validated_data)
+        else:
+            raise ValidationError("You have no permission!")
+        return document
