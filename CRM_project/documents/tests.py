@@ -236,6 +236,7 @@ class TestDocumentRulesPost(APITestCase):
         print(self.response.json())
         self.assertNotEqual(self.response.status_code, status.HTTP_201_CREATED)
 
+
     # all the POST tests for general-user
     def test_post_general_permissions_public(self):
         self.client.login(username='general', password='123456')
@@ -277,7 +278,7 @@ class TestDocumentRulesPost(APITestCase):
         self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
 
     def test_post_general_permissions_top_secret(self):
-        self.client.login(username='username', password='123456')
+        self.client.login(username='general', password='123456')
         data = {
             'title': 'title',
             'text': 'text',
@@ -287,8 +288,9 @@ class TestDocumentRulesPost(APITestCase):
         }
         self.response = self.client.post(self.url, data)
         print(self.response.json())
-        self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
+        self.assertContains(self.response, text="You have no permission!", status_code=400)
 
+    # all the POST tests for president-user
     def test_post_president_permissions_public(self):
         self.client.login(username='president', password='123456')
         data = {
@@ -297,6 +299,45 @@ class TestDocumentRulesPost(APITestCase):
             'status': 'active',
             'date_expired': '2020-06-06',
             'document_root': 'public'
+        }
+        self.response = self.client.post(self.url, data)
+        print(self.response.json())
+        self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
+
+    def test_post_president_permissions_private(self):
+        self.client.login(username='president', password='123456')
+        data = {
+            'title': 'title',
+            'text': 'text',
+            'status': 'active',
+            'date_expired': '2020-06-06',
+            'document_root': 'private'
+        }
+        self.response = self.client.post(self.url, data)
+        print(self.response.json())
+        self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
+
+    def test_post_president_permissions_secret(self):
+        self.client.login(username='president', password='123456')
+        data = {
+            'title': 'title',
+            'text': 'text',
+            'status': 'active',
+            'date_expired': '2020-06-06',
+            'document_root': 'secret'
+        }
+        self.response = self.client.post(self.url, data)
+        print(self.response.json())
+        self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
+
+    def test_post_president_permissions_top_secret(self):
+        self.client.login(username='president', password='123456')
+        data = {
+            'title': 'title',
+            'text': 'text',
+            'status': 'active',
+            'date_expired': '2020-06-06',
+            'document_root': 'top-secret'
         }
         self.response = self.client.post(self.url, data)
         print(self.response.json())
