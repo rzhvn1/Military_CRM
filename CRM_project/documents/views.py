@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
-from .permissions import IsSuperUserOrReadOnly, FilterObjPermission
+from .permissions import IsSuperUserOrReadOnly
 from .serializers import *
 # Create your views here.
 
 class DocumentModelViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsSuperUserOrReadOnly, FilterObjPermission]
+    permission_classes = [IsSuperUserOrReadOnly]
     serializer_class = DocumentSerializer
     filter_backends = [SearchFilter]
     search_fields = ['title']
@@ -26,3 +26,7 @@ class DocumentModelViewSet(viewsets.ModelViewSet):
         else:
             docs = Document.objects.all()
         return docs
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
