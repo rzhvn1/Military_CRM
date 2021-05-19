@@ -11,7 +11,7 @@ class Document(models.Model):
     file = models.FileField(blank=True)
     date_created = models.DateField(auto_now_add=True)
     date_expired = models.DateField()
-    status = models.CharField(choices=choice, max_length=10)
+    status = models.CharField(choices=choice, max_length=10, default='active')
     document_root = models.CharField(choices=(
         ('public', 'public'),
         ('private', 'private'),
