@@ -1,4 +1,7 @@
 from datetime import datetime
+
+from django.db import transaction
+
 from .services import mailing, validate_password
 from django.contrib.auth.models import Group
 from rest_framework import serializers
@@ -43,26 +46,40 @@ class DossierSerializer(serializers.ModelSerializer):
         model = Dossier
         fields = ['id', 'full_name', 'date_birth', 'gender', 'image', 'cars', 'educations', 'warcrafts']
 
-    #TODO
     def update(self, instance, validated_data):
         instance.full_name = validated_data.get('full_name',instance.full_name)
         cars_data = validated_data.pop('cars')
-        educations_data = validated_data.pop('schools')
+        educations_data = validated_data.pop('educations')
         warcrafts_data = validated_data.pop('warcrafts')
         for car in cars_data:
             car_id = car['id']
             car_data = Car.objects.get(id=car_id)
             car_data.mark = car['mark']
+            car_data.car_model = car['car_model']
+            car_data.year = car['year']
+            car_data.number = car['number']
+            car_data.color = car['color']
+            car_data.type = car['type']
             car_data.save()
         for education in educations_data:
             education_id = education['id']
             education_data = Education.objects.get(id=education_id)
             education_data.school_name = education['school_name']
+            education_data.start_date = education['start_date']
+            education_data.end_date = education['end_date']
+            education_data.major = education['major']
             education_data.save()
         for warcraft in warcrafts_data:
             warcraft_id = warcraft['id']
-            warcraft_data = Education.objects.get(id=warcraft_id)
-            warcraft_data.military_area = warcraft['school_name']
+            warcraft_data = Warcraft.objects.get(id=warcraft_id)
+            warcraft_data.military_area = warcraft['military_area']
+            warcraft_data.start_date = warcraft['start_date']
+            warcraft_data.end_date = warcraft['end_date']
+            warcraft_data.major = warcraft['major']
+            warcraft_data.start_pose = warcraft['start_pose']
+            warcraft_data.end_pose = warcraft['end_pose']
+            print("start_pose:",warcraft_data.start_pose)
+            print("end_pose:", warcraft_data.end_pose)
             warcraft_data.save()
         instance.save()
         return instance
@@ -81,6 +98,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'email', 'password', 'check_password', 'user_type', 'dossier']
 
+    @transaction.atomic
     def create(self, validated_data):
         user_type = validated_data.pop('user_type')
         password = validated_data.pop('password')
