@@ -25,7 +25,7 @@ class Car(models.Model):
     dossier = models.ForeignKey(Dossier, on_delete=models.CASCADE, related_name='cars')
     mark = models.CharField(max_length=100)
     car_model = models.CharField(max_length=100)
-    year = models.DateField(auto_now_add=True)
+    year = models.CharField(max_length=50)
     number = models.CharField(max_length=100)
     color = models.CharField(max_length=100)
     type = models.CharField(choices=choice, max_length=10)
