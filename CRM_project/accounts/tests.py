@@ -7,6 +7,9 @@ from rest_framework.test import APITestCase, APIClient
 # Create your tests here.
 
 # Test for Registration
+from accounts.models import Dossier, Car, Education, Warcraft
+
+
 class TestRegistration(APITestCase):
 
     def setUp(self):
@@ -415,6 +418,72 @@ class TestAuthorization(APITestCase):
         self.response = self.client.post(self.url, data)
         print(self.response.json())
         self.assertEqual(self.response.status_code, status.HTTP_200_OK)
+
+
+class TestDossier(APITestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse('dossier')
+        self.user = User.objects.create_user(username='rzhvn', password='Erjan02D35s2km')
+        self.dossier = Dossier.objects.create(user = self.user, full_name="Erzhan Muratov", date_birth="1999-06-02", gender="M")
+        Car.objects.create(dossier=self.dossier, mark="Hyundai", car_model="Avante", year="2011",
+                           number="01KG455AFV", color="White", type="Private")
+        Education.objects.create(dossier=self.dossier, start_date="2020-04-03", end_date="2021-04-03",
+                                 school_name="24 school", major="math")
+        Warcraft.objects.create(dossier=self.dossier, start_date="2019-04-03", end_date="2020-04-03",
+                                military_area="Batken", major="CS", start_pose='sergeant', end_pose="general")
+
+    def test_dossier_put(self):
+        self.client.login(username='rzhvn', password='Erjan02D35s2km')
+        data = {
+            "id": 23,
+            "full_name": "Erzhannnn Muratov",
+            "date_birth": "2021-05-19",
+            "gender": "M",
+            "cars": [
+                {
+                    "id": 14,
+                    "mark": "Hyundai",
+                    "car_model": "Avante",
+                    "year": "2011",
+                    "number": "01KG455AFV",
+                    "color": "White",
+                    "type": "Private"
+                }
+            ],
+            "educations": [
+                {
+                    "id": 9,
+                    "start_date": "2020-04-03",
+                    "end_date": "2021-04-03",
+                    "school_name": "24 school",
+                    "major": "math"
+                }
+            ],
+            "warcrafts": [
+                {
+                    "id": 8,
+                    "start_date": "2019-04-03",
+                    "end_date": "2020-04-03",
+                    "military_area": "Batken",
+                    "major": "CS",
+                    "start_pose": "sergeant",
+                    "end_pose": "general"
+                }
+            ]
+        }
+        self.response = self.client.put(self.url, data)
+        print(self.response.json())
+        self.assertContains(self.response, text="Successfully updated!", status_code=200)
+
+    def test_delete(self):
+        self.client.login(username='rzhvn', password='Erjan02D35s2km')
+        self.response = self.client.delete(self.url)
+        print(self.response.json())
+        self.assertEqual(self.response.status_code, status.HTTP_200_OK)
+
+
 
 
 
