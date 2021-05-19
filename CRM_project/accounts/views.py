@@ -7,26 +7,22 @@ from .models import *
 from .serializers import DossierSerializer, RegisterSerializer, CarSerializer, EducationSerializer, WarcraftSerializer
 from rest_framework import viewsets
 from .serializers import RegisterSerializer
+from .permissions import RegisterPermission
 # Create your views here.
 
 class DossierModelViewSet(views.APIView):
-    # serializer_class = DossierSerializer
-    #
-    # def get_queryset(self):
-    #     dossier = Dossier.objects.get(user=self.request.user)
-    #     return dossier
 
     def get(self, request, *args, **kwargs):
         try:
             dossier = Dossier.objects.get(user=request.user)
         except Dossier.DoesNotExist:
             return Response({"data":"Dossier doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = RegisterSerializer(dossier)
+        serializer = DossierSerializer(dossier)
         return Response(serializer.data)
 
     def put(self, request, *args, **kwargs):
         dossier = Dossier.objects.get(user=request.user)
-        serializer = RegisterSerializer(dossier, data=request.user)
+        serializer = DossierSerializer(dossier, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response("Successfully updated!")
@@ -42,6 +38,7 @@ class DossierModelViewSet(views.APIView):
 
 
 class RegisterViewSet(viewsets.ModelViewSet):
+    permission_classes = [RegisterPermission, ]
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
 
