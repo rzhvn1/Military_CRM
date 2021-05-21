@@ -12,28 +12,28 @@ from django.utils import timezone
 
 class WarcraftSerializer(serializers.ModelSerializer):
 
-    id = serializers.IntegerField()
+    warcraft_id = serializers.IntegerField(source='id', required=False)
 
     class Meta:
         model = Warcraft
-        fields = ['id', 'start_date', 'end_date', 'military_area', 'major', 'start_pose', 'end_pose']
+        fields = ['warcraft_id', 'start_date', 'end_date', 'military_area', 'major', 'start_pose', 'end_pose']
 
 class EducationSerializer(serializers.ModelSerializer):
 
-    id = serializers.IntegerField()
+    education_id = serializers.IntegerField(source='id', required=False)
 
     class Meta:
         model = Education
-        fields = ['id', 'start_date', 'end_date', 'school_name', 'major']
+        fields = ['education_id', 'start_date', 'end_date', 'school_name', 'major']
 
 
 class CarSerializer(serializers.ModelSerializer):
 
-    id = serializers.IntegerField()
+    car_id = serializers.IntegerField(source='id', required=False)
 
     class Meta:
         model = Car
-        fields = ['id', 'mark', 'car_model', 'year', 'number', 'color', 'type']
+        fields = ['car_id', 'mark', 'car_model', 'year', 'number', 'color', 'type']
 
 class DossierSerializer(serializers.ModelSerializer):
 
@@ -51,9 +51,23 @@ class DossierSerializer(serializers.ModelSerializer):
         cars_data = validated_data.pop('cars')
         educations_data = validated_data.pop('educations')
         warcrafts_data = validated_data.pop('warcrafts')
+        ids_list_car = [car.id for car in instance.cars.all()]
+        currents_ids_car = [car['id'] for car in cars_data]
+        final_list_car = [car_id for car_id in ids_list_car if car_id not in currents_ids_car]
+
+        ids_list_education = [education.id for education in instance.educations.all()]
+        currents_ids_education = [education['id'] for education in educations_data]
+        final_list_education = [education_id for education_id in ids_list_education if education_id not in currents_ids_education]
+
+        ids_list_warcraft = [warcraft.id for warcraft in instance.warcrafts.all()]
+        currents_ids_warcraft = [warcraft['id'] for warcraft in warcrafts_data]
+        final_list_warcraft = [warcraft_id for warcraft_id in ids_list_warcraft if warcraft_id not in currents_ids_warcraft]
         for car in cars_data:
             car_id = car['id']
             car_data = Car.objects.get(id=car_id)
+            for delete_id in final_list_car:
+                delete_car = Car.objects.get(id=delete_id)
+                delete_car.delete()
             car_data.mark = car['mark']
             car_data.car_model = car['car_model']
             car_data.year = car['year']
@@ -64,6 +78,9 @@ class DossierSerializer(serializers.ModelSerializer):
         for education in educations_data:
             education_id = education['id']
             education_data = Education.objects.get(id=education_id)
+            for delete_id in final_list_education:
+                delete_education = Education.objects.get(id=delete_id)
+                delete_education.delete()
             education_data.school_name = education['school_name']
             education_data.start_date = education['start_date']
             education_data.end_date = education['end_date']
@@ -72,14 +89,15 @@ class DossierSerializer(serializers.ModelSerializer):
         for warcraft in warcrafts_data:
             warcraft_id = warcraft['id']
             warcraft_data = Warcraft.objects.get(id=warcraft_id)
+            for delete_id in final_list_warcraft:
+                delete_warcraft = Warcraft.objects.get(id=delete_id)
+                delete_warcraft.delete()
             warcraft_data.military_area = warcraft['military_area']
             warcraft_data.start_date = warcraft['start_date']
             warcraft_data.end_date = warcraft['end_date']
             warcraft_data.major = warcraft['major']
             warcraft_data.start_pose = warcraft['start_pose']
             warcraft_data.end_pose = warcraft['end_pose']
-            print("start_pose:",warcraft_data.start_pose)
-            print("end_pose:", warcraft_data.end_pose)
             warcraft_data.save()
         instance.save()
         return instance
