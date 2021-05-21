@@ -434,48 +434,48 @@ class TestDossier(APITestCase):
         Warcraft.objects.create(dossier=self.dossier, start_date="2019-04-03", end_date="2020-04-03",
                                 military_area="Batken", major="CS", start_pose='sergeant', end_pose="general")
 
-    # def test_dossier_put(self):
-    #     self.client.login(username='rzhvn', password='Erjan02D35s2km')
-    #     data = {
-    #         "id": 23,
-    #         "full_name": "Erzhannnn Muratov",
-    #         "date_birth": "2021-05-19",
-    #         "gender": "M",
-    #         "cars": [
-    #             {
-    #                 "id": 14,
-    #                 "mark": "Hyundai",
-    #                 "car_model": "Avante",
-    #                 "year": "2011",
-    #                 "number": "01KG455AFV",
-    #                 "color": "White",
-    #                 "type": "Private"
-    #             }
-    #         ],
-    #         "educations": [
-    #             {
-    #                 "id": 9,
-    #                 "start_date": "2020-04-03",
-    #                 "end_date": "2021-04-03",
-    #                 "school_name": "24 school",
-    #                 "major": "math"
-    #             }
-    #         ],
-    #         "warcrafts": [
-    #             {
-    #                 "id": 8,
-    #                 "start_date": "2019-04-03",
-    #                 "end_date": "2020-04-03",
-    #                 "military_area": "Batken",
-    #                 "major": "CS",
-    #                 "start_pose": "sergeant",
-    #                 "end_pose": "general"
-    #             }
-    #         ]
-    #     }
-    #     self.response = self.client.put(self.url, data)
-    #     print(self.response.json())
-    #     self.assertContains(self.response, text="Successfully updated!", status_code=200)
+    def test_dossier_put(self):
+        self.client.login(username='rzhvn', password='Erjan02D35s2km')
+        data = {
+            "id": 23,
+            "full_name": "Erzhannnn Muratov",
+            "date_birth": "2021-05-19",
+            "gender": "M",
+            "cars": [
+                {
+                    "car_id": 1,
+                    "mark": "Hyundai",
+                    "car_model": "Avante",
+                    "year": "2011",
+                    "number": "01KG455AFV",
+                    "color": "White",
+                    "type": "Private"
+                }
+            ],
+            "educations": [
+                {
+                    "education_id": 1,
+                    "start_date": "2020-04-03",
+                    "end_date": "2021-04-03",
+                    "school_name": "24 school",
+                    "major": "math"
+                }
+            ],
+            "warcrafts": [
+                {
+                    "warcraft_id": 1,
+                    "start_date": "2019-04-03",
+                    "end_date": "2020-04-03",
+                    "military_area": "Batken",
+                    "major": "CS",
+                    "start_pose": "sergeant",
+                    "end_pose": "general"
+                }
+            ]
+        }
+        self.response = self.client.put(self.url, data=data, format='json')
+        print(self.response.json())
+        self.assertContains(self.response, text="Successfully updated!", status_code=200)
 
     def test_delete(self):
         self.client.login(username='rzhvn', password='Erjan02D35s2km')
